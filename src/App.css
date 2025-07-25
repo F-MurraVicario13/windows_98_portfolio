@@ -5,3 +5,9 @@
 body {
   @apply font-retro;
 }
+body {
+  font-family: 'Press Start 2P', sans-serif;
+}
+* {
+  image-rendering: pixelated;
+}

@@ -1,6 +1,12 @@
 import React, {useEffect} from 'react';
 
-const Terminal = ({ terminalLines, currentCommand, setCurrentCommand, handleKeyPress, setCurrentSection, time }) => {
+const Terminal = ({ 
+  terminalLines, 
+  currentCommand, 
+  setCurrentCommand, 
+  handleKeyPress, 
+  setCurrentSection, 
+  time }) => {
   useEffect(() => {
     const audio = new Audio('/dial_up.mp3'); // adjust path if needed
     audio.play().catch(err => console.log('Audio playback failed:', err));

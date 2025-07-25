@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { User, Folder, Computer, Mail, Settings, X, Minimize, Square } from 'lucide-react';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';
 import Window from './windows98/Window.jsx';
+import BootScreen from './BootScreen.js'; 
 
-const Windows98Desktop = ({ time, setCurrentSection }) => {
+const Windows98Desktop = ({ setCurrentSection, time }) => {
   const [openWindows, setOpenWindows] = useState([]);
   const [taskbarItems, setTaskbarItems] = useState([]);
   const [showStartMenu, setShowStartMenu] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [nextZIndex, setNextZIndex] = useState(1001);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // Auto-open welcome window on load
   useEffect(() => {
@@ -17,6 +19,15 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
       setShowWelcome(false);
     }
   }, [showWelcome]);
+  
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []); // Empty dependency array means this runs once on mount
 
   const openWindow = (windowType) => {
     const windowId = Date.now();
@@ -51,14 +62,24 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
   };
 
   const focusWindow = (windowId) => {
-    setOpenWindows(prevWindows => 
-      prevWindows.map(window => 
-        window.id === windowId 
-          ? { ...window, zIndex: nextZIndex }
-          : window
-      )
-    );
-    setNextZIndex(prev => prev + 1);
+    console.log('focusWindow called with ID:', windowId); //delete after
+    console.log('Current nextZIndex:', nextZIndex);
+    setOpenWindows(prevWindows => {
+      const updatedWindows = prevWindows.map(window => {
+        if (window.id === windowId) {
+          console.log(`Updating window ${windowId} z-index from ${window.zIndex} to ${nextZIndex}`);
+          return { ...window, zIndex: nextZIndex };
+        }
+        return window;
+      });
+      console.log('Updated windows:', updatedWindows);
+      return updatedWindows;
+    });
+    
+    setNextZIndex(prev => {
+      console.log('Incrementing nextZIndex from', prev, 'to', prev + 1);
+      return prev + 1;
+    });
   };
 
   const getWindowTitle = (type) => {
@@ -146,7 +167,6 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
             >
               <p className="text-xs">
                 <strong>Tip:</strong> Don't forget to click the <strong>"Start"</strong> button in the taskbar! 
-                I've hidden a special retro easter egg that pays homage to the classic computing era! 
               </p>
             </div>
 
@@ -348,13 +368,13 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
                   <div className="flex justify-between items-center">
                     <span>React.js</span>
                     <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-full h-full bg-blue-600"></div>
+                      <div className="w-4/6 h-full bg-blue-600"></div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>JavaScript</span>
                     <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-5/6 h-full bg-green-600"></div>
+                      <div className="w-4/6 h-full bg-green-600"></div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
@@ -399,11 +419,11 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
                   <div className="flex justify-between items-center">
                     <span>Express</span>
                     <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-3/4 h-full bg-purple-600"></div>
+                      <div className="w-3/5 h-full bg-purple-600"></div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>MongoDB</span>
+                    <span>SQL</span>
                     <div className="w-16 h-3 bg-gray-300 border">
                       <div className="w-3/4 h-full bg-green-700"></div>
                     </div>
@@ -444,7 +464,7 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
               }}
             >
               <p className="text-xs">
-                <strong>💡 Fun Fact:</strong> I know how to sail which may sound lame but it's actually pretty cool! ⛵
+                <strong>Fun Fact:</strong> I know how to sail which may sound lame but it's actually pretty cool! 
               </p>
             </div>
           </div>
@@ -834,17 +854,17 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
               <div 
                 onClick={() => {
                   setShowStartMenu(false);
-                  // Play the Windows 98 startup sound effect (if you have the audio file)
+                  // Play the Windows 98 startup sound effect 
                   const audio = new Audio('/o98.wav');
                   audio.play().catch(() => console.log('Audio file not found'));
                   
                   // Show nostalgic alert
                   setTimeout(() => {
-                    alert(`🎮 EASTER EGG ACTIVATED! 🎮\n\n` +
-                          `Welcome to the year 1998!\n` +
-                          `• Dial-up internet was king 👑\n` +
-                          `Thanks for exploring my retro portfolio!\n` +
-                          `Now get back to browsing... at 56k speeds! 📡`);
+                    alert(` EASTER EGG \n\n` +
+                          `HELLO WELCOME TO MY SECRET\n` +
+                          `If this is a recruiter, please hire me I need a job\n` +
+                          `If this is Daniel, then you chopped \n` +
+                          `Now get back to browsing`);
                   }, 500);
                 }}
                 className="flex items-center space-x-2 p-2 hover:bg-green-600 hover:text-white cursor-pointer text-sm font-bold"
@@ -864,7 +884,7 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
                 style={{ fontFamily: 'monospace' }}
                 onClick={() => {
                   if (window.confirm('Are you sure you want to shut down?')) {
-                    alert('Just kidding! This is a portfolio, not a real computer! 😄');
+                    alert('Bruh, this is a website, not a computer');
                   }
                   setShowStartMenu(false);
                 }}
@@ -878,15 +898,17 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
 
         {/* Open Windows */}
         {openWindows.filter(w => !w.minimized).map((window) => (
-          <Window
-            key={window.id}
-            window={window}
-            closeWindow={closeWindow}
-            minimizeWindow={minimizeWindow}
-            restoreWindow={restoreWindow}
-            renderContent={renderWindowContent}
-          />
-        ))}
+  <Window
+    key={window.id}
+    window={window}
+    closeWindow={closeWindow}
+    minimizeWindow={minimizeWindow}
+    restoreWindow={restoreWindow}
+    focusWindow={focusWindow} // Make sure this line is included
+    renderContent={renderWindowContent}
+  />
+))}
+      
 
         {/* Click outside to close start menu */}
         {showStartMenu && (
@@ -946,7 +968,7 @@ const Windows98Desktop = ({ time, setCurrentSection }) => {
               borderBottomColor: '#dfdfdf'
             }}
           >
-            {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
       </div>

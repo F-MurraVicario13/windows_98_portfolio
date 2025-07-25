@@ -4,7 +4,6 @@ import Terminal from './Terminal';
 import Windows98Desktop from './Windows98Desktop';
 import commands from './commands';
 
-
 const Portfolio = () => {
   const [bootComplete, setBootComplete] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -76,7 +75,7 @@ const Portfolio = () => {
             clearInterval(bootInterval);
             setTimeout(() => {
               setBootComplete(true);
-              setCurrentSection('terminal');
+              setCurrentSection('windows98'); // Go to Windows98 desktop after boot
               setTerminalLines([
                 'PORTFOLIO OS v1.0 [Built on MS-DOS 6.22]',
                 '(C) Copyright 1999-2024 Fernando Murra Industries, Inc.',
