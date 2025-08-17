@@ -315,7 +315,7 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
 
             <div className="flex space-x-2">
               <a 
-                href="/Resume.pdf"
+                href="/Fernando_Murra_Vicario_s_Official_Resume.pdf"
                 className="px-3 py-1 text-xs border-2"
                 style={{
                   backgroundColor: '#c0c0c0',
@@ -330,8 +330,8 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                 View Resume
               </a>
               <a 
-                href="/Resume.pdf"
-                download="Resume.pdf"
+                href="/Fernando_Murra_Vicario_s_Official_Resume.pdf"
+                download="Fernando_Murra_Vicario_s_Official_Resume.pdf"
                 className="px-3 py-1 text-xs border-2"
                 style={{
                   backgroundColor: '#c0c0c0',
