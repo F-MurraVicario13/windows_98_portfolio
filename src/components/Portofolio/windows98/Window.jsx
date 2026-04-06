@@ -1,45 +1,41 @@
 import React from 'react';
 import { Rnd } from 'react-rnd';
-import { X, Minimize, Square } from 'lucide-react';
 
-const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindow, renderContent }) => {
+const Window = ({ window, closeWindow, minimizeWindow, focusWindow, renderContent }) => {
   const handleWindowClick = () => {
-    console.log('Window clicked, ID:', window.id, 'current z-index:', window.zIndex);
     if (focusWindow) {
       focusWindow(window.id);
     }
   };
-  console.log('Rendering window:', window.id, 'with z-index:', window.zIndex);
+
   return (
     <Rnd
       default={{
-    x: 100 + (window.id % 200),
-    y: 100 + (window.id % 150),
-    width: 450,
-    height: 350,
-  }}
-  bounds="parent"
-  minWidth={350}
-  minHeight={250}
-  dragHandleClassName="window-titlebar"
-  className={`absolute shadow-lg pixelated window-${window.id}`} // Add unique class
-  style={{
-    border: '2px solid',
-    borderTopColor: '#dfdfdf',
-    borderLeftColor: '#dfdfdf',
-    borderRightColor: '#808080',
-    borderBottomColor: '#808080',
-    backgroundColor: '#c0c0c0',
-    imageRendering: 'pixelated',
-    zIndex: window.zIndex, // Keep this
-  }}
-  onMouseDown={handleWindowClick}
-  onDragStart={handleWindowClick}
-  onResizeStart={handleWindowClick}
+        x: 100 + (window.id % 200),
+        y: 80 + (window.id % 120),
+        width: window.defaultSize?.width || 450,
+        height: window.defaultSize?.height || 350
+      }}
+      bounds="parent"
+      minWidth={350}
+      minHeight={250}
+      dragHandleClassName="window-titlebar"
+      className={`absolute shadow-lg pixelated window-${window.id}`}
+      style={{
+        border: '2px solid',
+        borderTopColor: '#dfdfdf',
+        borderLeftColor: '#dfdfdf',
+        borderRightColor: '#808080',
+        borderBottomColor: '#808080',
+        backgroundColor: '#c0c0c0',
+        imageRendering: 'pixelated',
+        zIndex: window.zIndex
+      }}
+      onMouseDown={handleWindowClick}
+      onDragStart={handleWindowClick}
+      onResizeStart={handleWindowClick}
     >
-      {/* Rest of your component stays the same */}
       <div className="flex flex-col h-full pixelated">
-        {/* Title Bar */}
         <div
           className="window-titlebar px-2 py-1 flex items-center justify-between text-sm font-bold cursor-move pixelated"
           style={{
@@ -61,8 +57,8 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
                 fontWeight: 'bold',
                 fontFamily: 'monospace'
               }}
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 minimizeWindow(window.id);
               }}
             >
@@ -91,8 +87,8 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
                 fontWeight: 'bold',
                 fontFamily: 'monospace'
               }}
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 closeWindow(window.id);
               }}
             >
@@ -100,7 +96,7 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
             </button>
           </div>
         </div>
-        {/* Rest of your component... */}
+
         <div
           className="px-2 py-1 text-xs border-b pixelated"
           style={{
@@ -114,6 +110,7 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
           <span className="px-2 hover:bg-blue-600 hover:text-white cursor-pointer">View</span>
           <span className="px-2 hover:bg-blue-600 hover:text-white cursor-pointer">Help</span>
         </div>
+
         <div
           className="flex-1 overflow-auto pixelated"
           style={{
@@ -125,6 +122,7 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
         >
           {renderContent(window.type)}
         </div>
+
         <div
           className="px-2 py-1 text-xs border-t flex items-center justify-between pixelated"
           style={{
@@ -144,7 +142,7 @@ const Window = ({ window, closeWindow, minimizeWindow, restoreWindow, focusWindo
                 borderRightColor: '#004000',
                 borderBottomColor: '#004000'
               }}
-            ></div>
+            />
             <span className="text-xs">Connected</span>
           </div>
         </div>

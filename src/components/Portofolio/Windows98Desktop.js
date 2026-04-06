@@ -1,96 +1,357 @@
-import React, { useState, useEffect } from 'react';
-import { User, Folder, Computer, Mail, Settings, X, Minimize, Square } from 'lucide-react';
-import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Computer, FileText, Folder, Mail, Settings, User } from 'lucide-react';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import Window from './windows98/Window.jsx';
-import BootScreen from './BootScreen.js'; 
 
-const Windows98Desktop = ({ setCurrentSection, time }) => {
-  const [openWindows, setOpenWindows] = useState([]);
-  const [taskbarItems, setTaskbarItems] = useState([]);
-  const [showStartMenu, setShowStartMenu] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [nextZIndex, setNextZIndex] = useState(1001);
-  const [currentTime, setCurrentTime] = useState(new Date());
+const retroWindowSurface = {
+  backgroundColor: '#ffffff',
+  borderTopColor: '#808080',
+  borderLeftColor: '#808080',
+  borderRightColor: '#dfdfdf',
+  borderBottomColor: '#dfdfdf'
+};
 
-  // Auto-open welcome window on load
-  useEffect(() => {
-    if (showWelcome) {
-      openWindow('welcome');
-      setShowWelcome(false);
+const retroButtonStyle = {
+  backgroundColor: '#c0c0c0',
+  borderTopColor: '#dfdfdf',
+  borderLeftColor: '#dfdfdf',
+  borderRightColor: '#808080',
+  borderBottomColor: '#808080'
+};
+
+const windowConfig = {
+  welcome: {
+    title: 'Welcome to My Portfolio',
+    width: 520,
+    height: 430
+  },
+  about: {
+    title: 'About Fernando Murra Vicario',
+    width: 500,
+    height: 440
+  },
+  skills: {
+    title: 'Technical Skills',
+    width: 540,
+    height: 430
+  },
+  contact: {
+    title: 'Contact Information',
+    width: 480,
+    height: 420
+  },
+  resume: {
+    title: 'Resume Shortcut',
+    width: 420,
+    height: 300
+  },
+  groupchat: {
+    title: 'Project - GroupChat',
+    width: 620,
+    height: 500
+  },
+  genie: {
+    title: 'Project - Genie Chrome Extension',
+    width: 680,
+    height: 520
+  },
+  supermariodqn: {
+    title: 'Project - Super Mario DQN',
+    width: 620,
+    height: 500
+  },
+  bookreview: {
+    title: 'Project - Book Review',
+    width: 600,
+    height: 460
+  },
+  heatmap: {
+    title: 'Project - Heat Map',
+    width: 600,
+    height: 460
+  },
+  esgpipeline: {
+    title: 'Project - ESG Pipeline',
+    width: 620,
+    height: 480
+  }
+};
+
+const projectData = {
+  groupchat: {
+    name: 'GroupChat',
+    summary: 'A lightweight chat experience built with a Python backend and an HTML frontend.',
+    stack: ['HTML', 'Python', 'APIs'],
+    image: '/img/project_1.png',
+    github: 'https://github.com/F-MurraVicario13/GroupChat',
+    accent: '#d9ecff',
+    status: 'ACTIVE',
+    notes: [
+      'Focused on building end-to-end messaging flows.',
+      'Good example of shipping full-stack fundamentals quickly.'
+    ]
+  },
+  genie: {
+    name: 'Genie Chrome Extension',
+    summary: 'A Chrome extension that helps users draft cold outreach emails faster.',
+    stack: ['Gemini', 'JavaScript', 'Render'],
+    images: ['/img/project_2.png', '/img/project_2_1.png'],
+    github: 'https://github.com/F-MurraVicario13/Genie',
+    accent: '#fff0cf',
+    status: 'MAINTAINED',
+    notes: [
+      'Designed around a very direct productivity use case.',
+      'Blends browser UX, AI assistance, and deployment work.'
+    ]
+  },
+  supermariodqn: {
+    name: 'Super Mario DQN',
+    summary: 'A reinforcement learning project focused on training a Deep Q-Network to play Super Mario.',
+    stack: ['Python', 'DQN', 'Reinforcement Learning'],
+    github: 'https://github.com/F-MurraVicario13/super_mario_DQN',
+    accent: '#def7df',
+    status: 'RESEARCH',
+    notes: [
+      'Explores agent training, reward shaping, and game-state decision making.',
+      'A strong signal for applied machine learning and experimentation work.'
+    ]
+  },
+  bookreview: {
+    name: 'Book Review',
+    summary: 'A project centered on reviewing, organizing, and presenting book-related content in a clean workflow.',
+    stack: ['Python', 'Data', 'Web App'],
+    github: 'https://github.com/F-MurraVicario13/Book-Review',
+    accent: '#ffe4d1',
+    status: 'ACTIVE',
+    notes: [
+      'Combines content structure with practical application logic.',
+      'Shows product thinking beyond pure algorithm work.'
+    ]
+  },
+  heatmap: {
+    name: 'Heat Map',
+    summary: 'A visualization-driven project focused on mapping patterns and making dense information easier to read.',
+    stack: ['Data Viz', 'Python', 'Analytics'],
+    github: 'https://github.com/F-MurraVicario13/heat_map',
+    accent: '#f4d9ff',
+    status: 'ACTIVE',
+    notes: [
+      'Built around turning raw data into something visual and interpretable.',
+      'Good example of combining analytics with presentation.'
+    ]
+  },
+  esgpipeline: {
+    name: 'ESG Pipeline',
+    summary: 'A pipeline project for processing ESG-related data in a more structured and repeatable way.',
+    stack: ['Python', 'Pipelines', 'Data Engineering'],
+    github: 'https://github.com/F-MurraVicario13/esg_pipeline',
+    accent: '#d9ecff',
+    status: 'PIPELINE',
+    notes: [
+      'Focuses on automation, data flow, and repeatable processing steps.',
+      'Shows engineering discipline beyond frontend presentation.'
+    ]
+  }
+};
+
+const desktopItems = [
+  { id: 'about', label: 'About Me', type: 'window', windowType: 'about', icon: User, top: 20, left: 16 },
+  { id: 'skills', label: 'Skills', type: 'window', windowType: 'skills', icon: Computer, top: 124, left: 16 },
+  { id: 'contact', label: 'Contact', type: 'window', windowType: 'contact', icon: Mail, top: 228, left: 16 },
+  { id: 'resume', label: 'Resume', type: 'window', windowType: 'resume', icon: FileText, top: 332, left: 16 },
+  { id: 'groupchat', label: 'GroupChat', type: 'window', windowType: 'groupchat', icon: Folder, top: 20, left: 120 },
+  { id: 'genie', label: 'Genie', type: 'window', windowType: 'genie', icon: Folder, top: 124, left: 120 },
+  { id: 'supermariodqn', label: 'Super Mario DQN', type: 'window', windowType: 'supermariodqn', icon: Folder, top: 228, left: 120 },
+  { id: 'bookreview', label: 'Book Review', type: 'window', windowType: 'bookreview', icon: Folder, top: 332, left: 120 },
+  { id: 'heatmap', label: 'Heat Map', type: 'window', windowType: 'heatmap', icon: Folder, top: 20, left: 224 },
+  { id: 'esgpipeline', label: 'ESG Pipeline', type: 'window', windowType: 'esgpipeline', icon: Folder, top: 124, left: 224 },
+  { id: 'terminal', label: 'Terminal', type: 'section', section: 'terminal', icon: Settings, top: 228, left: 224 }
+];
+
+const tagColors = ['#d9ecff', '#def7df', '#fff0cf', '#f4d9ff', '#ffe4d1'];
+
+const Windows98Desktop = ({ setCurrentSection }) => {
+  const [openWindows, setOpenWindows] = useState([
+    {
+      id: 1000,
+      type: 'welcome',
+      title: windowConfig.welcome.title,
+      minimized: false,
+      zIndex: 1001,
+      defaultSize: { width: windowConfig.welcome.width, height: windowConfig.welcome.height }
     }
-  }, [showWelcome]);
-  
-  // Update time every second
+  ]);
+  const [showStartMenu, setShowStartMenu] = useState(false);
+  const [nextZIndex, setNextZIndex] = useState(1002);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedDesktopItem, setSelectedDesktopItem] = useState(null);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    
+
     return () => clearInterval(timer);
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
+
+  const taskbarItems = useMemo(() => openWindows, [openWindows]);
 
   const openWindow = (windowType) => {
-    const windowId = Date.now();
-    const newWindow = {
-      id: windowId,
-      type: windowType,
-      title: getWindowTitle(windowType),
-      minimized: false,
-      zIndex: nextZIndex
-    };
-    setOpenWindows([...openWindows, newWindow]);
-    setTaskbarItems([...taskbarItems, newWindow]);
-    setNextZIndex(prev => prev + 1);
+    const existingWindow = openWindows.find((item) => item.type === windowType);
+
+    if (existingWindow) {
+      restoreWindow(existingWindow.id);
+      return;
+    }
+
+    const config = windowConfig[windowType] || { title: 'Window', width: 450, height: 350 };
+    const windowId = Date.now() + Math.floor(Math.random() * 1000);
+
+    setOpenWindows((prev) => [
+      ...prev,
+      {
+        id: windowId,
+        type: windowType,
+        title: config.title,
+        minimized: false,
+        zIndex: nextZIndex,
+        defaultSize: { width: config.width, height: config.height }
+      }
+    ]);
+    setNextZIndex((prev) => prev + 1);
   };
 
   const closeWindow = (windowId) => {
-    setOpenWindows(openWindows.filter(w => w.id !== windowId));
-    setTaskbarItems(taskbarItems.filter(w => w.id !== windowId));
+    setOpenWindows((prev) => prev.filter((window) => window.id !== windowId));
   };
 
   const minimizeWindow = (windowId) => {
-    setOpenWindows(openWindows.map(w =>
-      w.id === windowId ? { ...w, minimized: true } : w
-    ));
+    setOpenWindows((prev) =>
+      prev.map((window) => (window.id === windowId ? { ...window, minimized: true } : window))
+    );
   };
 
   const restoreWindow = (windowId) => {
-    setOpenWindows(openWindows.map(w =>
-      w.id === windowId ? { ...w, minimized: false, zIndex: nextZIndex } : w
-    ));
-    setNextZIndex(prev => prev + 1);
+    setOpenWindows((prev) =>
+      prev.map((window) =>
+        window.id === windowId ? { ...window, minimized: false, zIndex: nextZIndex } : window
+      )
+    );
+    setNextZIndex((prev) => prev + 1);
   };
 
   const focusWindow = (windowId) => {
-    console.log('focusWindow called with ID:', windowId); //delete after
-    console.log('Current nextZIndex:', nextZIndex);
-    setOpenWindows(prevWindows => {
-      const updatedWindows = prevWindows.map(window => {
-        if (window.id === windowId) {
-          console.log(`Updating window ${windowId} z-index from ${window.zIndex} to ${nextZIndex}`);
-          return { ...window, zIndex: nextZIndex };
-        }
-        return window;
-      });
-      console.log('Updated windows:', updatedWindows);
-      return updatedWindows;
-    });
-    
-    setNextZIndex(prev => {
-      console.log('Incrementing nextZIndex from', prev, 'to', prev + 1);
-      return prev + 1;
-    });
+    setOpenWindows((prev) =>
+      prev.map((window) =>
+        window.id === windowId ? { ...window, zIndex: nextZIndex } : window
+      )
+    );
+    setNextZIndex((prev) => prev + 1);
   };
 
-  const getWindowTitle = (type) => {
-    const titles = {
-      about: 'About Fernando Murra Vicario',
-      projects: 'My Projects',
-      skills: 'Technical Skills',
-      contact: 'Contact Information',
-      welcome: 'Welcome to My Portfolio'
-    };
-    return titles[type] || 'Window';
+  const launchDesktopItem = (item) => {
+    setSelectedDesktopItem(item.id);
+    setShowStartMenu(false);
+
+    if (item.type === 'window') {
+      openWindow(item.windowType);
+      return;
+    }
+
+    if (item.type === 'section') {
+      setCurrentSection(item.section);
+    }
+  };
+
+  const renderProjectWindow = (projectKey) => {
+    const project = projectData[projectKey];
+
+    if (!project) {
+      return <div className="p-4">Project not found.</div>;
+    }
+
+    return (
+      <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
+        <div className="border-2 p-4 space-y-3" style={{ ...retroWindowSurface, backgroundColor: project.accent }}>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold" style={{ color: '#000080' }}>{project.name}</h3>
+              <p className="text-sm mt-1 max-w-xl">{project.summary}</p>
+            </div>
+            <div
+              className="px-3 py-1 text-xs border-2 font-bold"
+              style={{ ...retroButtonStyle, minWidth: 'fit-content' }}
+            >
+              {project.status}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            {project.stack.map((tag, index) => (
+              <span
+                key={tag}
+                className="px-2 py-1 border"
+                style={{ backgroundColor: tagColors[index % tagColors.length] }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-2 p-3 space-y-3" style={retroWindowSurface}>
+          <h4 className="font-bold text-sm" style={{ color: '#000080' }}>Project Preview</h4>
+          {project.images ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {project.images.map((image, index) => (
+                <img
+                  key={image}
+                  src={image}
+                  alt={`${project.name} preview ${index + 1}`}
+                  className="w-full h-auto border"
+                />
+              ))}
+            </div>
+          ) : project.image ? (
+            <img src={project.image} alt={`${project.name} preview`} className="w-full h-auto border" />
+          ) : (
+            <div
+              className="border-2 p-6 text-sm"
+              style={{ ...retroButtonStyle, backgroundColor: '#f3f3f3' }}
+            >
+              No screenshot added yet. The repo link is live, and this window acts as the project shortcut inside the desktop.
+            </div>
+          )}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-[1.3fr_0.9fr]">
+          <div className="border-2 p-3" style={retroWindowSurface}>
+            <h4 className="font-bold text-sm mb-2" style={{ color: '#000080' }}>Build Notes</h4>
+            <div className="space-y-2 text-sm">
+              {project.notes.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-2 p-3 space-y-3" style={{ ...retroWindowSurface, backgroundColor: '#ffffcc' }}>
+            <p className="text-xs">
+              <strong>Interaction hint:</strong> Minimize this window, then restore it from the taskbar like a real desktop app.
+            </p>
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 px-3 py-1 text-xs border-2"
+              style={retroButtonStyle}
+            >
+              <FaGithub className="w-3 h-3 text-gray-800" />
+              <span>Open GitHub Repo</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const renderWindowContent = (type) => {
@@ -98,120 +359,39 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
       case 'welcome':
         return (
           <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
-            <div className="flex items-start space-x-4 mb-4">
-              <div className="flex-1">
-                <h2 className="text-xl font-bold mb-2" style={{ color: '#000080' }}>Welcome to My Portfolio!</h2>
-                <p className="text-sm" style={{ color: '#008000' }}>Running on Windows 98 </p>
-              </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold" style={{ color: '#000080' }}>Welcome to My Portfolio</h2>
+              <p className="text-sm" style={{ color: '#008000' }}>Windows 98 Edition</p>
             </div>
 
-            <div 
-              className="p-4 border-2 space-y-3"
-              style={{
-                backgroundColor: '#ffffff',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#000080' }}>📁 What's Inside This Portfolio?</h3>
-              
+            <div className="p-4 border-2 space-y-3" style={retroWindowSurface}>
+              <h3 className="font-bold text-lg" style={{ color: '#000080' }}>Desktop Tour</h3>
               <div className="space-y-2 text-sm">
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 text-center">👤</span>
-                  <div>
-                    <strong>About Me:</strong> Learn about my background, experience, and passion for development
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 text-center">🛠️</span>
-                  <div>
-                    <strong>Skills:</strong> My technical expertise with progress bars
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 text-center">💼</span>
-                  <div>
-                    <strong>Projects:</strong> Some of my repos 
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 text-center">📧</span>
-                  <div>
-                    <strong>Contact:</strong> Get in touch for opportunities and collaborations
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <span className="w-6 text-center">⚡</span>
-                  <div>
-                    <strong>Terminal:</strong> Access my retro command-line interface
-                  </div>
-                </div>
+                <p><strong>About Me</strong> covers my background and what I enjoy building.</p>
+                <p><strong>Skills</strong> shows the stack I use most often.</p>
+                <p><strong>Each project</strong> now lives as its own desktop icon, so the portfolio feels more like an operating system.</p>
+                <p><strong>Terminal</strong> is still available if you want the command line version.</p>
               </div>
             </div>
 
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#ffffcc',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
+            <div className="p-3 border-2" style={{ ...retroWindowSurface, backgroundColor: '#ffffcc' }}>
               <p className="text-xs">
-                <strong>Tip:</strong> Don't forget to click the <strong>"Start"</strong> button in the taskbar! 
+                <strong>Tip:</strong> Single-click an icon to select it. Double-click to open it.
               </p>
             </div>
 
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#e6f3ff',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
+            <div className="p-3 border-2" style={{ ...retroWindowSurface, backgroundColor: '#e6f3ff' }}>
               <p className="text-sm">
-                <strong>Why Windows 98 Theme?</strong><br/>
-                This retro interface represents a nostalgic tribute to one of the most iconic operating systems of all time.
+                The whole site is meant to feel like you are browsing a retro desktop instead of a normal portfolio page.
               </p>
             </div>
 
-            <div className="flex space-x-2 justify-center">
-              <button 
-                onClick={() => openWindow('about')}
-                className="px-4 py-2 text-sm border-2"
-                style={{
-                  backgroundColor: '#c0c0c0',
-                  borderTopColor: '#dfdfdf',
-                  borderLeftColor: '#dfdfdf',
-                  borderRightColor: '#808080',
-                  borderBottomColor: '#808080'
-                }}
-              >
-              About Me
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button onClick={() => openWindow('about')} className="px-4 py-2 text-sm border-2" style={retroButtonStyle}>
+                Open About Me
               </button>
-              <button 
-                onClick={() => closeWindow(openWindows.find(w => w.type === 'welcome')?.id)}
-                className="px-4 py-2 text-sm border-2"
-                style={{
-                  backgroundColor: '#c0c0c0',
-                  borderTopColor: '#dfdfdf',
-                  borderLeftColor: '#dfdfdf',
-                  borderRightColor: '#808080',
-                  borderBottomColor: '#808080'
-                }}
-              >
-                Close 
+              <button onClick={() => openWindow('supermariodqn')} className="px-4 py-2 text-sm border-2" style={retroButtonStyle}>
+                Open a Project
               </button>
             </div>
           </div>
@@ -221,9 +401,9 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
         return (
           <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
             <div className="flex items-start space-x-4">
-              <div 
+              <div
                 className="w-16 h-16 border-2 flex items-center justify-center"
-                style={{ 
+                style={{
                   backgroundColor: '#008080',
                   borderTopColor: '#00ffff',
                   borderLeftColor: '#00ffff',
@@ -231,12 +411,7 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                   borderBottomColor: '#004040'
                 }}
               >
-                <img 
-                  src="img/headshot-1.jpeg" 
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  style={{ imageRendering: 'pixelated' }}
-                />
+                <img src="/img/headshot-1.jpeg" alt="Profile" className="w-full h-full object-cover" style={{ imageRendering: 'pixelated' }} />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-bold mb-2" style={{ color: '#000080' }}>About Me</h2>
@@ -244,369 +419,145 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                   <p><strong>Name:</strong> Fernando Murra Vicario</p>
                   <p><strong>Title:</strong> Full Stack Developer</p>
                   <p><strong>Location:</strong> San Antonio, TX</p>
-                  <p><strong>Experience:</strong> 3+ years</p>
+                  <p><strong>Focus:</strong> Software development, cybersecurity, and data analytics</p>
                 </div>
               </div>
             </div>
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#ffffff',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
+
+            <div className="p-3 border-2" style={retroWindowSurface}>
               <p className="text-sm leading-relaxed">
-                Developer with expertise in CyberSecurity, Software Development & Data Analytics. 
-                I love creating solutions and bringing ideas to life through code. 
-                When I'm not coding, you can find me on the soccer pitch or on the beach.
+                I like building products that are useful, clear, and a little memorable. This portfolio leans into a retro desktop idea,
+                but the goal is still straightforward: show the projects I have built and give a better sense of how I think and work.
               </p>
             </div>
 
-            {/* Social Links Section */}
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#e6f3ff',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
-              <h4 className="font-bold text-sm mb-2">Connect with me:</h4>
-              <div className="flex space-x-3">
-                <a 
+            <div className="p-3 border-2" style={{ ...retroWindowSurface, backgroundColor: '#e6f3ff' }}>
+              <h4 className="font-bold text-sm mb-2">Outside of coding</h4>
+              <p className="text-sm">You will probably find me on a soccer pitch or near the beach.</p>
+            </div>
+
+            <div className="p-3 border-2" style={retroWindowSurface}>
+              <h4 className="font-bold text-sm mb-2">Connect with me</h4>
+              <div className="flex flex-wrap gap-3">
+                <a
                   href="https://linkedin.com/in/fernando-murra-vicario-/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 px-3 py-1 text-xs border-2 hover:bg-blue-100"
-                  style={{
-                    backgroundColor: '#c0c0c0',
-                    borderTopColor: '#dfdfdf',
-                    borderLeftColor: '#dfdfdf',
-                    borderRightColor: '#808080',
-                    borderBottomColor: '#808080'
-                  }}
+                  className="flex items-center space-x-2 px-3 py-1 text-xs border-2"
+                  style={retroButtonStyle}
                 >
                   <FaLinkedin className="w-3 h-3 text-blue-600" />
                   <span>LinkedIn</span>
                 </a>
-                <a 
+                <a
                   href="https://github.com/F-MurraVicario13/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 px-3 py-1 text-xs border-2 hover:bg-gray-100"
-                  style={{
-                    backgroundColor: '#c0c0c0',
-                    borderTopColor: '#dfdfdf',
-                    borderLeftColor: '#dfdfdf',
-                    borderRightColor: '#808080',
-                    borderBottomColor: '#808080'
-                  }}
+                  className="flex items-center space-x-2 px-3 py-1 text-xs border-2"
+                  style={retroButtonStyle}
                 >
                   <FaGithub className="w-3 h-3 text-gray-800" />
                   <span>GitHub</span>
                 </a>
+                <a
+                  href="/Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 text-xs border-2"
+                  style={retroButtonStyle}
+                >
+                  View Resume
+                </a>
+                <a
+                  href="/Resume.pdf"
+                  download="Fernando_Murra_Vicario_Resume.pdf"
+                  className="px-3 py-1 text-xs border-2"
+                  style={retroButtonStyle}
+                >
+                  Download Resume
+                </a>
               </div>
-            </div>
-
-            <div className="flex space-x-2">
-              <a 
-                href="/Fernando_Murra_Vicario_s_Official_Resume.pdf"
-                className="px-3 py-1 text-xs border-2"
-                style={{
-                  backgroundColor: '#c0c0c0',
-                  borderTopColor: '#dfdfdf',
-                  borderLeftColor: '#dfdfdf',
-                  borderRightColor: '#808080',
-                  borderBottomColor: '#808080'
-                }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Resume
-              </a>
-              <a 
-                href="/Fernando_Murra_Vicario_s_Official_Resume.pdf"
-                download="Fernando_Murra_Vicario_s_Official_Resume.pdf"
-                className="px-3 py-1 text-xs border-2"
-                style={{
-                  backgroundColor: '#c0c0c0',
-                  borderTopColor: '#dfdfdf',
-                  borderLeftColor: '#dfdfdf',
-                  borderRightColor: '#808080',
-                  borderBottomColor: '#808080'
-                }}
-              >
-                Download CV
-              </a>
             </div>
           </div>
         );
-      
+
       case 'skills':
         return (
           <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
-            <h3 className="font-bold mb-4 text-lg" style={{ color: '#000080' }}>Technical Skills</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
-                <h4 className="font-bold text-sm mb-2">Frontend</h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
+            <h3 className="font-bold text-lg" style={{ color: '#000080' }}>Technical Skills</h3>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="p-3 border-2" style={retroWindowSurface}>
+                <h4 className="font-bold text-sm mb-3">Frontend</h4>
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between items-center gap-4">
                     <span>React.js</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-4/6 h-full bg-blue-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-4/5 h-full bg-blue-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>JavaScript</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-4/6 h-full bg-green-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-4/5 h-full bg-green-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>TypeScript</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-4/5 h-full bg-yellow-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-3/4 h-full bg-yellow-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>HTML/CSS</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-5/6 h-full bg-orange-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-5/6 h-full bg-orange-600" /></div>
                   </div>
                 </div>
               </div>
 
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
-                <h4 className="font-bold text-sm mb-2">Backend</h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
+              <div className="p-3 border-2" style={retroWindowSurface}>
+                <h4 className="font-bold text-sm mb-3">Backend</h4>
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between items-center gap-4">
                     <span>Node.js</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-5/6 h-full bg-green-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-5/6 h-full bg-green-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>Python</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-4/5 h-full bg-blue-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-4/5 h-full bg-blue-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>Express</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-3/5 h-full bg-purple-600"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-3/5 h-full bg-purple-600" /></div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4">
                     <span>SQL</span>
-                    <div className="w-16 h-3 bg-gray-300 border">
-                      <div className="w-3/4 h-full bg-green-700"></div>
-                    </div>
+                    <div className="w-24 h-3 bg-gray-300 border"><div className="w-3/4 h-full bg-green-700" /></div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#ffffff',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
+            <div className="p-3 border-2" style={retroWindowSurface}>
               <h4 className="font-bold text-sm mb-2">Tools & Technologies</h4>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <span className="px-2 py-1 bg-gray-200 border text-center">Git</span>
-                <span className="px-2 py-1 bg-blue-200 border text-center">Docker</span>
-                <span className="px-2 py-1 bg-green-200 border text-center">AWS</span>
-                <span className="px-2 py-1 bg-yellow-200 border text-center">VS Code</span>
-                <span className="px-2 py-1 bg-purple-200 border text-center">Postman</span>
-                <span className="px-2 py-1 bg-red-200 border text-center">Linux</span>
+              <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-3">
+                {['Git', 'Docker', 'AWS', 'VS Code', 'Postman', 'Linux'].map((tool, index) => (
+                  <span key={tool} className="px-2 py-1 border text-center" style={{ backgroundColor: tagColors[index] }}>
+                    {tool}
+                  </span>
+                ))}
               </div>
             </div>
 
-            <div 
-              className="p-3 border-2"
-              style={{
-                backgroundColor: '#ffffcc',
-                borderTopColor: '#808080',
-                borderLeftColor: '#808080',
-                borderRightColor: '#dfdfdf',
-                borderBottomColor: '#dfdfdf'
-              }}
-            >
+            <div className="p-3 border-2" style={{ ...retroWindowSurface, backgroundColor: '#ffffcc' }}>
               <p className="text-xs">
-                <strong>Fun Fact:</strong> I know how to sail which may sound lame but it's actually pretty cool! 
+                <strong>Fun Fact:</strong> I know how to sail, which sounds random until it turns into a very useful story.
               </p>
             </div>
           </div>
         );
-      
-      case 'projects':
-        return (
-          <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
-            <h3 className="font-bold mb-4 text-lg" style={{ color: '#000080' }}>My Projects</h3>
-            
-            <div className="space-y-3">
-              <div 
-                className="p-3 border-2 flex items-start space-x-3"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm">GroupChat</h4>
-                  <p className="text-xs text-gray-600 mb-2">Made a GroupChat using Python for Backend and HTML for the frontend</p>
-                  <div className="flex space-x-1 mb-2">
-                    <span className="px-2 py-1 text-xs bg-blue-200 border">HTML</span>
-                    <span className="px-2 py-1 text-xs bg-green-200 border">Python</span>
-                    <span className="px-2 py-1 text-xs bg-purple-200 border">APIs</span>
-                  </div>
-                  <img 
-                    src="img/project_1.png" 
-                    alt="GroupChat preview"
-                    className="max-w-md mx-auto h-auto object-cover rounded mb-2 border"
-                  />
-                  <a 
-                    href="https://github.com/F-MurraVicario13/GroupChat" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1 text-xs text-blue-600 underline hover:text-blue-800"
-                  >
-                    <FaGithub className="w-3 h-3" />
-                    <span>View on GitHub</span>
-                  </a>
-                </div>
-              </div>
 
-              <div 
-                className="p-3 border-2 flex items-start space-x-3"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm">Genie Chrome Extension</h4>
-                  <p className="text-xs text-gray-600 mb-2">Chrome Extension that helps write Cold Emails</p>
-                  <div className="flex space-x-1 mb-2">
-                    <span className="px-2 py-1 text-xs bg-blue-200 border">Gemini</span>
-                    <span className="px-2 py-1 text-xs bg-orange-200 border">JavaScript</span>
-                    <span className="px-2 py-1 text-xs bg-red-200 border">Render</span>
-                  </div>
-                  <div className="flex space-x-2 mb-2">
-                    <img 
-                      src="img/project_2.png" 
-                      alt="Genie Chrome Extension preview"
-                      className="max-w-md mx-auto h-auto max-h-64 object-cover rounded border"
-                    />
-                    <img 
-                      src="img/project_2_1.png" 
-                      alt="project 2"
-                      className="max-w-md mx-auto h-auto max-h-64 object-cover rounded border"
-                    />
-                  </div>
-                  <a 
-                    href="https://github.com/F-MurraVicario13/Genie" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1 text-xs text-blue-600 underline hover:text-blue-800"
-                  >
-                    <FaGithub className="w-3 h-3" />
-                    <span>View on GitHub</span>
-                  </a>
-                </div>
-              </div>
-
-              <div 
-                className="p-3 border-2 flex items-start space-x-3"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm">BatteryFinder</h4>
-                  <p className="text-xs text-gray-600 mb-2">An app that quickly identifies the exact replacement batteries you need for any device by scanning or searching model numbers in seconds.</p>
-                  <div className="flex space-x-1 mb-2">
-                    <span className="px-2 py-1 text-xs bg-yellow-200 border">React Native</span>
-                    <span className="px-2 py-1 text-xs bg-green-200 border">Node.js</span>
-                    <span className="px-2 py-1 text-xs bg-blue-200 border">Supabase</span>
-                  </div>
-                  <img 
-                    src="img/project_3.png" 
-                    alt="BatteryFinder preview"
-                    className="w-full h-auto rounded mb-2 border"
-                  />
-                  <a 
-                    href="https://github.com/F-MurraVicario13/BatteryFinder" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1 text-xs text-blue-600 underline hover:text-blue-800"
-                  >
-                    <FaGithub className="w-3 h-3" />
-                    <span>View on GitHub</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      
       case 'contact':
         return (
           <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
-            <h3 className="font-bold mb-4 text-lg" style={{ color: '#000080' }}>Contact Information</h3>
-            
+            <h3 className="font-bold text-lg" style={{ color: '#000080' }}>Contact Information</h3>
+
             <div className="space-y-3">
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
+              <div className="p-3 border-2" style={retroWindowSurface}>
                 <div className="flex items-center space-x-3 mb-2">
                   <Mail className="w-4 h-4" />
                   <strong className="text-sm">Email</strong>
@@ -614,21 +565,12 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                 <p className="text-sm ml-7">fmuvic13@gmail.com</p>
               </div>
 
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
+              <div className="p-3 border-2" style={retroWindowSurface}>
                 <div className="flex items-center space-x-3 mb-2">
                   <FaLinkedin className="w-4 h-4 text-blue-600" />
                   <strong className="text-sm">LinkedIn</strong>
                 </div>
-                <a 
+                <a
                   href="https://linkedin.com/in/fernando-murra-vicario-/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -638,21 +580,12 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                 </a>
               </div>
 
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
+              <div className="p-3 border-2" style={retroWindowSurface}>
                 <div className="flex items-center space-x-3 mb-2">
                   <FaGithub className="w-4 h-4 text-gray-800" />
                   <strong className="text-sm">GitHub</strong>
                 </div>
-                <a 
+                <a
                   href="https://github.com/F-MurraVicario13/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -662,61 +595,60 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                 </a>
               </div>
 
-              <div 
-                className="p-3 border-2"
-                style={{
-                  backgroundColor: '#ffffcc',
-                  borderTopColor: '#808080',
-                  borderLeftColor: '#808080',
-                  borderRightColor: '#dfdfdf',
-                  borderBottomColor: '#dfdfdf'
-                }}
-              >
+              <div className="p-3 border-2" style={{ ...retroWindowSurface, backgroundColor: '#ffffcc' }}>
                 <p className="text-xs">
-                  <strong>Available for:</strong> Freelance projects, full-time opportunities, 
-                  and collaborative ventures. Let's build something amazing together!
+                  <strong>Available for:</strong> freelance projects, full-time roles, and collaborations that need a builder who likes shipping.
                 </p>
               </div>
             </div>
 
-            <div className="flex space-x-2">
-              <a href="mailto:fmuvic13@gmail.com">
-                <button 
-                  className="px-3 py-1 text-xs border-2"
-                  style={{
-                    backgroundColor: '#c0c0c0',
-                    borderTopColor: '#dfdfdf',
-                    borderLeftColor: '#dfdfdf',
-                    borderRightColor: '#808080',
-                    borderBottomColor: '#808080'
-                  }}
-                >
-                  Send Email
-                </button>
+            <div className="flex flex-wrap gap-2">
+              <a href="mailto:fmuvic13@gmail.com" className="px-3 py-1 text-xs border-2" style={retroButtonStyle}>
+                Send Email
               </a>
-              <a 
+              <a
                 href="https://linkedin.com/in/fernando-murra-vicario-/"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-1 text-xs border-2"
+                style={retroButtonStyle}
               >
-                <button 
-                  className="flex items-center space-x-1 px-3 py-1 text-xs border-2"
-                  style={{
-                    backgroundColor: '#c0c0c0',
-                    borderTopColor: '#dfdfdf',
-                    borderLeftColor: '#dfdfdf',
-                    borderRightColor: '#808080',
-                    borderBottomColor: '#808080'
-                  }}
-                >
-                  <FaLinkedin className="w-3 h-3 text-blue-600" />
-                  <span>Connect</span>
-                </button>
+                <FaLinkedin className="w-3 h-3 text-blue-600" />
+                <span>Connect</span>
               </a>
             </div>
           </div>
         );
-      
+
+      case 'resume':
+        return (
+          <div className="p-4 space-y-4 pixelated" style={{ fontFamily: 'monospace', imageRendering: 'pixelated' }}>
+            <div className="p-4 border-2" style={retroWindowSurface}>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#000080' }}>Resume Shortcut</h3>
+              <p className="text-sm">
+                Open the PDF in a new tab or download it directly from this desktop window.
+              </p>
+            </div>
+
+            <div className="p-3 border-2 flex flex-wrap gap-2" style={{ ...retroWindowSurface, backgroundColor: '#e6f3ff' }}>
+              <a href="/Resume.pdf" target="_blank" rel="noopener noreferrer" className="px-3 py-1 text-xs border-2" style={retroButtonStyle}>
+                Open Resume
+              </a>
+              <a href="/Resume.pdf" download="Fernando_Murra_Vicario_Resume.pdf" className="px-3 py-1 text-xs border-2" style={retroButtonStyle}>
+                Download Resume
+              </a>
+            </div>
+          </div>
+        );
+
+      case 'groupchat':
+      case 'genie':
+      case 'supermariodqn':
+      case 'bookreview':
+      case 'heatmap':
+      case 'esgpipeline':
+        return renderProjectWindow(type);
+
       default:
         return <div className="p-4">Window content</div>;
     }
@@ -724,7 +656,6 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
 
   return (
     <>
-      {/* Add pixelated styling to the entire page */}
       <style>{`
         .pixelated {
           image-rendering: -moz-crisp-edges;
@@ -732,7 +663,7 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
           image-rendering: pixelated;
           image-rendering: crisp-edges;
         }
-        
+
         .pixelated * {
           image-rendering: -moz-crisp-edges;
           image-rendering: -webkit-crisp-edges;
@@ -740,45 +671,66 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
           image-rendering: crisp-edges;
         }
       `}</style>
-      
-      <div 
+
+      <div
         className="min-h-screen relative overflow-hidden pixelated"
-        style={{ 
+        style={{
           backgroundColor: '#008080',
           backgroundImage: 'url("/bliss.jpg")',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          imageRendering: 'pixelated'
+          backgroundPosition: 'center'
+        }}
+        onClick={() => {
+          setSelectedDesktopItem(null);
+          setShowStartMenu(false);
         }}
       >
-        {/* Desktop Icons */}
-        <div className="absolute top-4 left-4 space-y-4">
-          <div onClick={() => openWindow('about')} className="flex flex-col items-center cursor-pointer p-2 hover:bg-blue-200 hover:bg-opacity-30 rounded pixelated">
-            <User className="w-8 h-8 text-white mb-1" />
-            <span className="text-white text-xs text-center font-bold" style={{ textShadow: '1px 1px 0px #000' }}>About Me</span>
-          </div>
-          <div onClick={() => openWindow('projects')} className="flex flex-col items-center cursor-pointer p-2 hover:bg-blue-200 hover:bg-opacity-30 rounded pixelated">
-            <Folder className="w-8 h-8 text-white mb-1" />
-            <span className="text-white text-xs text-center font-bold" style={{ textShadow: '1px 1px 0px #000' }}>Projects</span>
-          </div>
-          <div onClick={() => openWindow('skills')} className="flex flex-col items-center cursor-pointer p-2 hover:bg-blue-200 hover:bg-opacity-30 rounded pixelated">
-            <Computer className="w-8 h-8 text-white mb-1" />
-            <span className="text-white text-xs text-center font-bold" style={{ textShadow: '1px 1px 0px #000' }}>Skills</span>
-          </div>
-          <div onClick={() => openWindow('contact')} className="flex flex-col items-center cursor-pointer p-2 hover:bg-blue-200 hover:bg-opacity-30 rounded pixelated">
-            <Mail className="w-8 h-8 text-white mb-1" />
-            <span className="text-white text-xs text-center font-bold" style={{ textShadow: '1px 1px 0px #000' }}>Contact</span>
-          </div>
-          <div onClick={() => setCurrentSection('terminal')} className="flex flex-col items-center cursor-pointer p-2 hover:bg-blue-200 hover:bg-opacity-30 rounded pixelated">
-            <Settings className="w-8 h-8 text-white mb-1" />
-            <span className="text-white text-xs text-center font-bold" style={{ textShadow: '1px 1px 0px #000' }}>Terminal</span>
-          </div>
+        {desktopItems.map((item) => {
+          const Icon = item.icon;
+          const isSelected = selectedDesktopItem === item.id;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className="absolute flex w-20 flex-col items-center rounded p-2 text-white"
+              style={{
+                top: item.top,
+                left: item.left,
+                backgroundColor: isSelected ? 'rgba(0, 0, 128, 0.45)' : 'transparent',
+                outline: isSelected ? '1px dotted rgba(255,255,255,0.8)' : 'none'
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+                setSelectedDesktopItem(item.id);
+              }}
+              onDoubleClick={(event) => {
+                event.stopPropagation();
+                launchDesktopItem(item);
+              }}
+            >
+              <Icon className="w-9 h-9 mb-2 drop-shadow-[1px_1px_0_#000]" />
+              <span className="text-[11px] text-center font-bold leading-tight" style={{ textShadow: '1px 1px 0 #000' }}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+
+        <div
+          className="absolute top-4 right-4 max-w-xs border-2 p-3 text-xs"
+          style={{
+            ...retroWindowSurface,
+            backgroundColor: 'rgba(255, 255, 204, 0.95)',
+            fontFamily: 'monospace'
+          }}
+        >
+          Double-click icons to open windows. Each project is its own desktop shortcut now.
         </div>
 
-        {/* Start Menu */}
         {showStartMenu && (
-          <div 
-            className="absolute bottom-8 left-0 w-64 border-2 shadow-lg pixelated"
+          <div
+            className="absolute bottom-8 left-0 w-72 border-2 shadow-lg pixelated"
             style={{
               backgroundColor: '#c0c0c0',
               borderTopColor: '#dfdfdf',
@@ -787,8 +739,9 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
               borderBottomColor: '#808080',
               zIndex: 9999
             }}
+            onClick={(event) => event.stopPropagation()}
           >
-            <div 
+            <div
               className="p-2 border-b"
               style={{
                 background: 'linear-gradient(90deg, #0000ff 0%, #000080 100%)',
@@ -799,89 +752,40 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
             >
               Windows 98 Portfolio
             </div>
-            
-            <div className="p-2 space-y-1">
-              <div 
-                onClick={() => { openWindow('about'); setShowStartMenu(false); }}
-                className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="w-4">👤</span>
-                <span>About Me</span>
-              </div>
-              
-              <div 
-                onClick={() => { openWindow('projects'); setShowStartMenu(false); }}
-                className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="w-4">💼</span>
-                <span>My Projects</span>
-              </div>
-              
-              <div 
-                onClick={() => { openWindow('skills'); setShowStartMenu(false); }}
-                className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="w-4">🛠️</span>
-                <span>Technical Skills</span>
-              </div>
-              
-              <div 
-                onClick={() => { openWindow('contact'); setShowStartMenu(false); }}
-                className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="w-4">📧</span>
-                <span>Contact Info</span>
-              </div>
-              
+
+            <div className="p-2 space-y-1" style={{ fontFamily: 'monospace' }}>
+              {desktopItems.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => launchDesktopItem(item)}
+                  className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
+                >
+                  <span>{item.label}</span>
+                </div>
+              ))}
+
               <hr style={{ borderColor: '#808080', margin: '4px 0' }} />
-              
-              <div 
-                onClick={() => { setCurrentSection('terminal'); setShowStartMenu(false); }}
-                className="flex items-center space-x-2 p-2 hover:bg-blue-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="w-4">⚡</span>
-                <span>Terminal</span>
-              </div>
-              
-              <hr style={{ borderColor: '#808080', margin: '4px 0' }} />
-              
-              {/* Easter Egg Button */}
-              <div 
+
+              <div
                 onClick={() => {
                   setShowStartMenu(false);
-                  // Play the Windows 98 startup sound effect 
                   const audio = new Audio('/o98.wav');
-                  audio.play().catch(() => console.log('Audio file not found'));
-                  
-                  // Show nostalgic alert
+                  audio.play().catch(() => null);
+
                   setTimeout(() => {
-                    alert(` EASTER EGG \n\n` +
-                          `HELLO WELCOME TO MY SECRET\n` +
-                          `If this is a recruiter, please hire me I need a job\n` +
-                          `If this is Daniel, then you chopped \n` +
-                          `Now get back to browsing`);
+                    alert(
+                      'EASTER EGG\n\nHELLO WELCOME TO MY SECRET\nIf this is a recruiter, please hire me I need a job\nIf this is Daniel, then you chopped\nNow get back to browsing'
+                    );
                   }, 500);
                 }}
                 className="flex items-center space-x-2 p-2 hover:bg-green-600 hover:text-white cursor-pointer text-sm font-bold"
-                style={{ 
-                  fontFamily: 'monospace',
-                  backgroundColor: '#ffff99'
-                }}
+                style={{ backgroundColor: '#ffff99' }}
               >
-                <span className="w-4">🎁</span>
                 <span>??? Mystery Box</span>
               </div>
-              
-              <hr style={{ borderColor: '#808080', margin: '4px 0' }} />
-              
-              <div 
+
+              <div
                 className="flex items-center space-x-2 p-2 hover:bg-red-600 hover:text-white cursor-pointer text-sm"
-                style={{ fontFamily: 'monospace' }}
                 onClick={() => {
                   if (window.confirm('Are you sure you want to shut down?')) {
                     alert('Bruh, this is a website, not a computer');
@@ -889,46 +793,35 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
                   setShowStartMenu(false);
                 }}
               >
-                <span className="w-4">🔌</span>
                 <span>Shut Down...</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* Open Windows */}
-        {openWindows.filter(w => !w.minimized).map((window) => (
-  <Window
-    key={window.id}
-    window={window}
-    closeWindow={closeWindow}
-    minimizeWindow={minimizeWindow}
-    restoreWindow={restoreWindow}
-    focusWindow={focusWindow} // Make sure this line is included
-    renderContent={renderWindowContent}
-  />
-))}
-      
-
-        {/* Click outside to close start menu */}
-        {showStartMenu && (
-          <div 
-            className="fixed inset-0 z-40"
-            onClick={() => setShowStartMenu(false)}
+        {openWindows.filter((window) => !window.minimized).map((window) => (
+          <Window
+            key={window.id}
+            window={window}
+            closeWindow={closeWindow}
+            minimizeWindow={minimizeWindow}
+            restoreWindow={restoreWindow}
+            focusWindow={focusWindow}
+            renderContent={renderWindowContent}
           />
-        )}
+        ))}
 
-        {/* Taskbar */}
-        <div 
+        <div
           className="absolute bottom-0 left-0 right-0 h-8 flex items-center px-2 pixelated"
           style={{
             backgroundColor: '#c0c0c0',
             borderTop: '1px solid #dfdfdf',
             borderBottom: '1px solid #808080'
           }}
+          onClick={(event) => event.stopPropagation()}
         >
-          <button 
-            onClick={() => setShowStartMenu(!showStartMenu)}
+          <button
+            onClick={() => setShowStartMenu((prev) => !prev)}
             className="px-3 py-1 text-xs font-bold flex items-center gap-2 mr-2 border pixelated"
             style={{
               backgroundColor: showStartMenu ? '#808080' : '#c0c0c0',
@@ -941,10 +834,11 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
           >
             ⊞ Start
           </button>
+
           {taskbarItems.map((item) => (
-            <button 
-              key={item.id} 
-              onClick={() => item.minimized ? restoreWindow(item.id) : minimizeWindow(item.id)} 
+            <button
+              key={item.id}
+              onClick={() => (item.minimized ? restoreWindow(item.id) : minimizeWindow(item.id))}
               className="px-3 py-1 text-xs mr-1 border pixelated"
               style={{
                 backgroundColor: item.minimized ? '#c0c0c0' : '#808080',
@@ -958,7 +852,8 @@ const Windows98Desktop = ({ setCurrentSection, time }) => {
               {item.title}
             </button>
           ))}
-          <div 
+
+          <div
             className="ml-auto text-xs border px-2 py-1 pixelated"
             style={{
               backgroundColor: '#c0c0c0',
