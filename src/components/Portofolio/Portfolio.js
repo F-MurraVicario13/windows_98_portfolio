@@ -4,6 +4,35 @@ import Terminal from './Terminal';
 import Windows98Desktop from './Windows98Desktop';
 import commands from './commands';
 
+const bootSteps = [
+  'Phoenix BIOS v6.00',
+  'Copyright 1985-1998 Phoenix Technologies Ltd.',
+  '',
+  'Detecting Primary Master... IBM-DTLA-307030',
+  'Detecting Primary Slave... None',
+  'Detecting Secondary Master... HITACHI DVD-ROM GD-2500',
+  'Detecting Secondary Slave... None',
+  '',
+  'Memory Test: 65536K OK',
+  '',
+  'Award Modular BIOS v6.0, An Energy Star Ally',
+  'Copyright (C) 1984-99, Award Software, Inc.',
+  '',
+  'AMD Athlon(tm) Processor',
+  '    650 MHz Processor',
+  '    Bus Clock: 100 MHz',
+  '',
+  'Press DEL to enter SETUP',
+  '',
+  'Verifying DMI Pool Data...........',
+  'Boot from CD: MSCDEX Version 2.25',
+  'OAKCDROM.SYS Version 2.35',
+  '',
+  'Loading PORTFOLIO.EXE...',
+  'Initializing Terminal Interface...',
+  <><strong>READY</strong></>
+];
+
 const Portfolio = () => {
   const [bootComplete, setBootComplete] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -14,35 +43,6 @@ const Portfolio = () => {
   const [terminalLines, setTerminalLines] = useState([]);
   const [showSkipButton, setShowSkipButton] = useState(false);
   const [time, setTime] = useState(new Date());
-
-  const bootSteps = [
-    'Phoenix BIOS v6.00',
-    'Copyright 1985-1998 Phoenix Technologies Ltd.',
-    '',
-    'Detecting Primary Master... IBM-DTLA-307030',
-    'Detecting Primary Slave... None',
-    'Detecting Secondary Master... HITACHI DVD-ROM GD-2500',
-    'Detecting Secondary Slave... None',
-    '',
-    'Memory Test: 65536K OK',
-    '',
-    'Award Modular BIOS v6.0, An Energy Star Ally',
-    'Copyright (C) 1984-99, Award Software, Inc.',
-    '',
-    'AMD Athlon(tm) Processor',
-    '    650 MHz Processor',
-    '    Bus Clock: 100 MHz',
-    '',
-    'Press DEL to enter SETUP',
-    '',
-    'Verifying DMI Pool Data...........',
-    'Boot from CD: MSCDEX Version 2.25',
-    'OAKCDROM.SYS Version 2.35',
-    '',
-    'Loading PORTFOLIO.EXE...',
-    'Initializing Terminal Interface...',
-    <><strong>READY</strong></>
-  ];
 
   // Update time every second
   useEffect(() => {
