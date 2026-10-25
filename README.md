@@ -1,70 +1,86 @@
-# Getting Started with Create React App
+# Windows 98 Portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Fernando Murra Vicario's developer portfolio, built as a Windows 98 desktop. Live at **[fernandomurra.com](https://fernandomurra.com/)**.
 
-## Available Scripts
+The site boots with a retro BIOS screen, then drops you onto a desktop where every section and project is an icon. Windows can be dragged, resized, minimized to the taskbar and restored. There is also a terminal mode for anyone who prefers typing.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Boot sequence** with a skip button
+- **Retro sounds**: dial-up in the terminal, plus a hidden easter egg in the Start menu
+- **Desktop windows** for About Me, Skills, Contact and Resume (opens the PDF)
+- **One window per project** with a summary, tech stack, screenshots, build notes and a GitHub link
+- **Terminal** (desktop icon) with these commands:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Command | What it does |
+|---|---|
+| `/help` | List all commands |
+| `/about` | Personal info |
+| `/skills` | Technical skills |
+| `/projects` | Project list with tech stacks |
+| `/contact` | Contact info |
+| `/gui` or `/skip` | Back to the desktop |
+| `/clear` | Clear the screen |
+| `/exit` | Return to the boot screen |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Projects featured
 
-### `npm test`
+| Project | What it is | Stack |
+|---|---|---|
+| [GroupChat](https://github.com/F-MurraVicario13/GroupChat) | Real-time chat room over WebSockets | Python, Flask, Flask-SocketIO |
+| [Genie](https://github.com/F-MurraVicario13/Genie) | Chrome extension that turns a LinkedIn profile into a personalized cold email in Gmail | JavaScript, Chrome MV3, Gemini API, Render |
+| [Super Mario DQN](https://github.com/F-MurraVicario13/super_mario_DQN) | Deep Q-Network that learns Mario 1-1 from raw pixels | Python, PyTorch, TorchRL, OpenAI Gym |
+| [Book Review (Marginalia)](https://github.com/F-MurraVicario13/Book-Review) | Search books, rate and review them, keep a personal shelf | Next.js 14, React, Supabase, Tailwind |
+| [Heat Map (CityPulse)](https://github.com/F-MurraVicario13/heat_map) | U.S. metro migration map built from IRS data | React, Leaflet, Supabase, Recharts, Python ETL |
+| [ESG Pipeline](https://github.com/F-MurraVicario13/esg_pipeline) | NLP/ML ESG scoring with greenwashing detection | Python, Streamlit, scikit-learn, NLTK, Plotly |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech stack
 
-### `npm run build`
+- React 19 (Create React App)
+- Tailwind CSS
+- react-rnd for draggable, resizable windows
+- lucide-react and react-icons for icons
+- Press Start 2P font via Fontsource
+- Google Analytics (gtag.js)
+- Deployed on Vercel
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Run locally
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Open [http://localhost:3000](http://localhost:3000).
 
-### `npm run eject`
+To make a production build in `build/`:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm run build
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Project structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+public/
+  index.html          SEO meta tags, structured data, Google Analytics tag
+  img/                Project screenshots
+  Resume.pdf          Linked from the Resume window
+src/components/Portofolio/
+  Portfolio.js        Boot sequence and switching between desktop and terminal
+  BootScreen.js       BIOS-style boot screen
+  Windows98Desktop.js Desktop, icons, windows and project data
+  Terminal.js         Terminal UI
+  commands.js         Terminal command output
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Adding or editing a project
 
-## Learn More
+1. Add an entry to `windowConfig` and `projectData` in `Windows98Desktop.js`
+2. Add a desktop icon to `desktopItems` in the same file
+3. Add it to the `/projects` output in `commands.js`
+4. Optional: put screenshots in `public/img/` and reference them with `image` or `images`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Hosted on Vercel as a standard Create React App build: `npm run build`, serving the `build/` folder.
