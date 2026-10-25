@@ -80,76 +80,76 @@ const windowConfig = {
 const projectData = {
   groupchat: {
     name: 'GroupChat',
-    summary: 'A lightweight chat experience built with a Python backend and an HTML frontend.',
-    stack: ['HTML', 'Python', 'APIs'],
+    summary: 'A real-time group chat app: pick a username, join the room, and messages broadcast instantly to everyone connected over WebSockets.',
+    stack: ['Python', 'Flask', 'Flask-SocketIO', 'HTML/JS'],
     image: '/img/project_1.png',
     github: 'https://github.com/F-MurraVicario13/GroupChat',
     accent: '#d9ecff',
     status: 'ACTIVE',
     notes: [
-      'Focused on building end-to-end messaging flows.',
-      'Good example of shipping full-stack fundamentals quickly.'
+      'Flask handles login with session cookies; Flask-SocketIO pushes send_message events to every client in real time.',
+      'Tracks connected users by socket ID and broadcasts join/leave notices when people connect or drop off.'
     ]
   },
   genie: {
     name: 'Genie Chrome Extension',
-    summary: 'A Chrome extension that helps users draft cold outreach emails faster.',
-    stack: ['Gemini', 'JavaScript', 'Render'],
+    summary: 'A Manifest V3 Chrome extension that reads a LinkedIn profile and drafts a personalized cold email, subject line included, right inside Gmail.',
+    stack: ['JavaScript', 'Chrome MV3', 'Gemini API', 'Render'],
     images: ['/img/project_2.png', '/img/project_2_1.png'],
     github: 'https://github.com/F-MurraVicario13/Genie',
     accent: '#fff0cf',
     status: 'MAINTAINED',
     notes: [
-      'Designed around a very direct productivity use case.',
-      'Blends browser UX, AI assistance, and deployment work.'
+      'Content scripts scrape name, headline, location and About from LinkedIn, then inject the generated draft into Gmail.',
+      'Gemini calls go through a small proxy hosted on Render so no API key ships inside the extension.'
     ]
   },
   supermariodqn: {
     name: 'Super Mario DQN',
-    summary: 'A reinforcement learning project focused on training a Deep Q-Network to play Super Mario.',
-    stack: ['Python', 'DQN', 'Reinforcement Learning'],
+    summary: 'A PyTorch Deep Q-Network that learns to play Super Mario Bros World 1-1 from raw pixels, starting fully random and improving by trial and error.',
+    stack: ['Python', 'PyTorch', 'TorchRL', 'OpenAI Gym'],
     github: 'https://github.com/F-MurraVicario13/super_mario_DQN',
     accent: '#def7df',
     status: 'RESEARCH',
     notes: [
-      'Explores agent training, reward shaping, and game-state decision making.',
-      'A strong signal for applied machine learning and experimentation work.'
+      'Frames are grayscaled, resized, frame-skipped (x4) and stacked (x4) before a CNN outputs Q-values per action.',
+      'Online + frozen target network, 100k-transition replay buffer, epsilon-greedy exploration, trained up to 50,000 episodes with checkpoints every 5,000.'
     ]
   },
   bookreview: {
-    name: 'Book Review',
-    summary: 'A project centered on reviewing, organizing, and presenting book-related content in a clean workflow.',
-    stack: ['Python', 'Data', 'Web App'],
+    name: 'Book Review (Marginalia)',
+    summary: 'A full-stack book review app: search any book, see its cover and average rating, write reviews, and keep a personal review shelf.',
+    stack: ['Next.js 14', 'React', 'Supabase', 'Tailwind CSS'],
     github: 'https://github.com/F-MurraVicario13/Book-Review',
     accent: '#ffe4d1',
     status: 'ACTIVE',
     notes: [
-      'Combines content structure with practical application logic.',
-      'Shows product thinking beyond pure algorithm work.'
+      'Search runs on the Google Books API with covers from Open Library; books and reviews persist in Supabase Postgres.',
+      'Supabase Auth for email/password sign-in, with row-level security so users can only edit their own reviews.'
     ]
   },
   heatmap: {
-    name: 'Heat Map',
-    summary: 'A visualization-driven project focused on mapping patterns and making dense information easier to read.',
-    stack: ['Data Viz', 'Python', 'Analytics'],
+    name: 'Heat Map (CityPulse)',
+    summary: 'An interactive map of U.S. metro migration trends (2018-2022) built from IRS county-to-county movement data.',
+    stack: ['React', 'Leaflet', 'Supabase', 'Recharts', 'Python ETL'],
     github: 'https://github.com/F-MurraVicario13/heat_map',
     accent: '#f4d9ff',
     status: 'ACTIVE',
     notes: [
-      'Built around turning raw data into something visual and interpretable.',
-      'Good example of combining analytics with presentation.'
+      'Python ETL loads raw IRS outflow files and Census metro boundaries into Postgres, then precomputes per-metro metrics.',
+      'Map queries only the metros in view (debounced and cached), and each city opens a trend chart with top inbound and outbound flows, exportable as PNG.'
     ]
   },
   esgpipeline: {
     name: 'ESG Pipeline',
-    summary: 'A pipeline project for processing ESG-related data in a more structured and repeatable way.',
-    stack: ['Python', 'Pipelines', 'Data Engineering'],
+    summary: 'An ESG signal scoring pipeline that collects company data and uses NLP and ML to score Environmental, Social and Governance performance and flag possible greenwashing.',
+    stack: ['Python', 'Streamlit', 'scikit-learn', 'NLTK/TextBlob', 'Plotly'],
     github: 'https://github.com/F-MurraVicario13/esg_pipeline',
     accent: '#d9ecff',
     status: 'PIPELINE',
     notes: [
-      'Focuses on automation, data flow, and repeatable processing steps.',
-      'Shows engineering discipline beyond frontend presentation.'
+      'Pulls from SEC EDGAR filings, news feeds, company sustainability pages and Yahoo Finance ESG scores.',
+      'Keyword signal extraction + sentiment scoring, Isolation Forest for anomalies and K-means for peer grouping, all in a Streamlit dashboard.'
     ]
   }
 };
